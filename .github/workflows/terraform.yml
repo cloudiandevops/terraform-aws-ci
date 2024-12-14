@@ -34,26 +34,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Bootstrap S3 Bucket
+      - name: Create S3 Bucket
         working-directory: ${{ env.S3_BACKEND_DIR }}
         run: 
           terraform init
-      - name: terraform apply for backend
+      - name: terraform apply for S3 bucket creation
         working-directory: ${{ env.S3_BACKEND_DIR }}
         run: terraform apply -auto-approve
-
-      - name: Terraform Init
+      - name: Terraform Init reconfigure with backend config
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init -reconfigure
-
-      # - name: Terraform Format Check
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   run: terraform fmt -check
-
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -out=tfplan
-
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         working-directory: ${{ env.TF_WORKING_DIR }}
