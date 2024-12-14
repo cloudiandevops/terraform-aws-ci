@@ -34,12 +34,24 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Replace with your desired region
-
-      # Step 4: Terraform Init
-      - name: Terraform Init
-        working-directory: ${{ env.TF_WORKING_DIR }}
+          aws-region: ap-south-1 # Replace with your desired region
+      ## Step 3: Run Bootstrap (Create S3 Bucket)
+      - name: Terraform Init for Bootstrap
+        working-directory: terraform-aws/s3-backend
         run: terraform init
+
+      - name: Terraform Apply for Bootstrap
+        working-directory: terraform-aws/s3-backend
+        run: terraform apply -auto-approve
+      - name: Initialize Backend
+        run: |
+            if terraform state pull | grep -q "terraform-aws-ci-state-unique"; then
+            terraform init -reconfigure
+            fi
+      # # Step 4: Terraform Init
+      # - name: Terraform Init
+      #   working-directory: ${{ env.TF_WORKING_DIR }}
+      #   run: terraform init
 
       # Step 5: Terraform Format Check
       - name: Terraform Format Check
