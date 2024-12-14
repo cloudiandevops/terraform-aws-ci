@@ -10,7 +10,7 @@ on:
 
 env:
   TF_VERSION: "1.6.0" # Specify your Terraform version
-  TF_WORKING_DIR: terraform # Directory containing Terraform configuration
+  TF_WORKING_DIR: terraform-aws # Directory containing Terraform configuration
 
 jobs:
   terraform:
