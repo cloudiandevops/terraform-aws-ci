@@ -1,7 +1,7 @@
 resource "aws_instance" "web" {
   count         = 2
-  ami           = "ami-0c02fb55956c7d316" # Replace with a valid Amazon Linux 2 AMI
-  instance_type = "t2.micro"
+  ami           = var.ami # Replace with a valid Amazon Linux 2 AMI
+  instance_type = var.instance_type
   subnet_id     = aws_subnet.subnet[count.index].id
   associate_public_ip_address = true  # Ensures the instance gets a public IP
 
