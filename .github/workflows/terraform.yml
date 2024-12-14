@@ -36,17 +36,15 @@ jobs:
 
       - name: Bootstrap S3 Bucket
         working-directory: ${{ env.S3_BACKEND_DIR }}
-        run: |
+        run: 
           terraform init
-          terraform apply -auto-approve
-
-      - name: Initialize Backend
+      - name: terraform apply for backend
         working-directory: ${{ env.S3_BACKEND_DIR }}
-        run: terraform init -reconfigure
+        run: terraform apply -auto-approve
 
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
-        run: terraform init
+        run: terraform init -reconfigure
 
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
