@@ -9,8 +9,9 @@ on:
       - main
 
 env:
-  TF_VERSION: "1.6.0" # Specify your Terraform version
-  TF_WORKING_DIR: terraform-aws # Directory containing Terraform configuration
+  TF_VERSION: "1.6.0"
+  TF_WORKING_DIR: terraform-aws
+  S3_BACKEND_DIR: terraform-aws/s3-backend
 
 jobs:
   terraform:
@@ -18,52 +19,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # Step 2: Set up Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: ${{ env.TF_VERSION }}
 
-      # Step 3: Configure AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-south-1 # Replace with your desired region
-      ## Step 3: Run Bootstrap (Create S3 Bucket)
-      - name: Terraform Init for Bootstrap
-        working-directory: terraform-aws/s3-backend
-        run: terraform init
+          aws-region: ap-south-1
 
-      - name: Terraform Apply for Bootstrap
-        working-directory: terraform-aws/s3-backend
-        run: terraform apply -auto-approve
-      - name: Initialize Backend
+      - name: Bootstrap S3 Bucket
+        working-directory: ${{ env.S3_BACKEND_DIR }}
         run: |
-            if terraform state pull | grep -q "terraform-aws-ci-state-unique"; then
-            terraform init -reconfigure
-            fi
-      # Step 4: Terraform Init
+          terraform init
+          terraform apply -auto-approve
+
+      - name: Initialize Backend
+        working-directory: ${{ env.S3_BACKEND_DIR }}
+        run: terraform init -reconfigure
+
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
 
-      # Step 5: Terraform Format Check
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform fmt -check
 
-      # Step 6: Terraform Plan
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform plan -out=tfplan
 
-      # Step 7: Apply Changes (on `main` branch only)
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         working-directory: ${{ env.TF_WORKING_DIR }}
