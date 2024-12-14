@@ -48,10 +48,10 @@ jobs:
             if terraform state pull | grep -q "terraform-aws-ci-state-unique"; then
             terraform init -reconfigure
             fi
-      # # Step 4: Terraform Init
-      # - name: Terraform Init
-      #   working-directory: ${{ env.TF_WORKING_DIR }}
-      #   run: terraform init
+      # Step 4: Terraform Init
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform init
 
       # Step 5: Terraform Format Check
       - name: Terraform Format Check
