@@ -5,10 +5,12 @@
 
 ###   count = length(data.aws_s3_bucket.existing_bucket.id) == 0 ? 1 : 0  ###
 
-This is a ternary operator (a shorthand for an if-else condition).
-The condition checks if the length of the bucket ID is equal to 0. This is used to verify whether the S3 bucket exists.
-If the bucket does not exist (length == 0), it means the data block couldn't find the bucket, and count will be set to 1 (the resource should be created).
-If the bucket exists (length != 0), count will be set to 0, meaning the resource should not be created.
+Conditional Creation (count):
+The count determines whether the S3 bucket is created. It checks if the existing_bucket data source has a bucket ID:
+
+length(data.aws_s3_bucket.existing_bucket.id) == 0 ? 1 : 0
+If the bucket does not exist (length == 0), the count is 1 (create the bucket).
+If it exists, the count is 0 (do not create the bucket).
 
 Instead of checking for an empty tuple using id != "", we now check whether the bucket exists by using the length function. If the bucket does not exist, count will be 1 (create the bucket); if it exists, count will be 0 (do not create the bucket).
 
